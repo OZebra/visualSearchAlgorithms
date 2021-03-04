@@ -2,49 +2,53 @@ const SQUARE_SIZE = 18;
 const MATRIX_SIZE = 50;
 const FRAME_RATIO = 24;
 
-var squares = [],
-   state,
-   shipCount,
-   goldCount;
+var squares = [], //Armazena os nós do algorítmo
+   state, //Armazena o estado usado pra poder fazer a gamificação edição e etd;
+   shipCount, //Armazena a quantidade de navios disponíveis
+   goldCount, //Armazena a quantidade de ouro/tesouros disponíveis
+   editingObj, //Armazena qual objeto está sendo colocado ao clicar
+   editButton, //
+   playButton, //
+   eraseButton, //
+   shipButton, //
+   stateLabel, // Todos esses são apenas criação de elementos de
+   shipLabel, // texto e botões para poder editar e começar o
+   goldLabel, // algorítmo.
+   rockButton, //
+   goldButton; //
 
-let editButton,
-   playButton,
-   stateLabel,
-   shipLabel,
-   goldLabel,
-   editingObj,
-   rockButton,
-   goldButton;
-
-var openSet = [],
-   closedSet = [],
-   endNode = [],
-   startNode = [];
+var openSet = [], //Armazena os nós que estão sendo visitados(A*)
+   closedSet = [], //Armazena os nós que já foram visitados (A*)
+   endNode = [], //Armazena o nó final
+   startNode = []; //Armazena o nó inicial
 
 function Square(xparam, yparam, squareSize) {
-   this.f = 0;
-   this.g = 0;
-   this.h = 0;
-   this.neighbourhood = [];
-   this.cameFrom = undefined;
+   //Descrição do objeto quadrado, usado para montar o grid e rodar o algorítmo
+   this.f = 0; // Parâmetros usados para calcular o A *
+   this.g = 0; //     f = g + h [custo_total = custo_padrão + custo_heurístico]
+   this.h = 0; //  lembrando que o custo heurístico é só uma "aproximação" do custo de um dado nó até a chegada
+   this.neighbourhood = []; //Array que vai guardar todos os vizinhos de um dado quadrado na matriz
+   this.cameFrom = undefined; //Array que vai guardar qual nó que colocou o nó atual no openset (usado para pintar o caminho)
 
-   this.x = xparam;
-   this.y = yparam;
-   this.posX = this.x * squareSize;
-   this.posY = this.y * squareSize;
-   this.xCenter = this.posX + squareSize / 2;
-   this.yCenter = this.posY + squareSize / 2;
-   this.size = squareSize;
-   this.color = color(135, 174, 211);
-   this.state = 2;
+   this.x = xparam; //x do quadrado na matriz
+   this.y = yparam; //y do quadrado na matriz
+   this.posX = this.x * squareSize; //posição do quadrado baseada no X
+   this.posY = this.y * squareSize; //posição do quadrado baseada no Y
+   this.xCenter = this.posX + squareSize / 2; //Coordenada x do centro do quadrado (usada para calcular o click)
+   this.yCenter = this.posY + squareSize / 2; //Coordenada y do centro do quadrado (usada para calcular o click)
+   this.size = squareSize; //Tamanho do quadrado
+   this.color = color(135, 174, 211); //Cor inicial
+   this.state = 2; //estado inicial (0 = pedra, 1 = tesouro, 2 = água, 3 = navio)
 
    this.display = function () {
+      //Função display apenas exibe o quadrado no canvas criado em setup()
       strokeWeight(1);
       stroke(0, 0, 0);
       fill(this.color);
       rect(this.posX, this.posY, this.size, this.size);
    };
    this.vizinhos = function (squares) {
+      //Essa função cria os vizinhos de um dado quadrado (lembrando que tudo isso são referências);
       if (this.x - 1 > -1) {
          this.neighbourhood.push(squares[(this.x - 1) * MATRIX_SIZE + this.y]);
       }
@@ -58,7 +62,14 @@ function Square(xparam, yparam, squareSize) {
          this.neighbourhood.push(squares[this.x * MATRIX_SIZE + (this.y + 1)]);
       }
    };
+
    this.click = function (newState, parent) {
+      /*
+         Função que verifica se o click foi no quadrado
+         recebe um state equivalente ao editObj, isto é, o state do elemento square
+         apenas diz qual tipo de quadrado ele é. o state da aplicação diz qual a fase
+         de execução atual.
+      */
       let dX = int(dist(mouseX, 0, this.xCenter, 0));
       let dY = int(dist(0, mouseY, 0, this.yCenter));
 
@@ -89,6 +100,10 @@ function Square(xparam, yparam, squareSize) {
    };
 }
 
+/*
+   FUNÇÕES DE CRIAÇÃO DE ELEMENTOS HTML (BOTÕES E LABELS)
+*/
+
 function createEditButton() {
    editButton = createButton("Editar");
    editButton.style("font-size", "50px");
@@ -104,10 +119,10 @@ function createEditButton() {
 }
 
 function createStartButton() {
-   editButton = createButton("Começar");
-   editButton.style("font-size", "50px");
-   editButton.position(1000, 400);
-   editButton.mousePressed(() => {
+   playButton = createButton("Começar");
+   playButton.style("font-size", "50px");
+   playButton.position(1000, 400);
+   playButton.mousePressed(() => {
       state = 1;
       stateLabel.html("Procurando tesouros!");
    });
@@ -125,10 +140,10 @@ function createPutRockButton() {
 }
 
 function createPutGoldButton() {
-   rockButton = createButton("Colocar Ouro");
-   rockButton.style("font-size", "20px");
-   rockButton.position(1150, 215);
-   rockButton.mousePressed(() => {
+   goldButton = createButton("Colocar Ouro");
+   goldButton.style("font-size", "20px");
+   goldButton.position(1150, 215);
+   goldButton.mousePressed(() => {
       state = 0;
       editingObj = 1;
       stateLabel.html("Editando: Colocando ouro!");
@@ -136,10 +151,10 @@ function createPutGoldButton() {
 }
 
 function createEraseButton() {
-   rockButton = createButton("Desfazer");
-   rockButton.style("font-size", "20px");
-   rockButton.position(1150, 250);
-   rockButton.mousePressed(() => {
+   eraseButton = createButton("Desfazer");
+   eraseButton.style("font-size", "20px");
+   eraseButton.position(1150, 250);
+   eraseButton.mousePressed(() => {
       state = 0;
       editingObj = 2;
       stateLabel.html("Editando: Desfazendo alterações");
@@ -147,10 +162,10 @@ function createEraseButton() {
 }
 
 function createPutShipButton() {
-   rockButton = createButton("Colocar Navio");
-   rockButton.style("font-size", "20px");
-   rockButton.position(1150, 300);
-   rockButton.mousePressed(() => {
+   shipButton = createButton("Colocar Navio");
+   shipButton.style("font-size", "20px");
+   shipButton.position(1150, 300);
+   shipButton.mousePressed(() => {
       state = 0;
       editingObj = 3;
       stateLabel.html("Editando: Posicionando Frota!");
@@ -174,23 +189,31 @@ function createGoldCountLabel() {
    goldLabel.style("font-size: 30px");
    goldLabel.position(1000, 610);
 }
-
+//A função setup roda uma vez no início do código/
 function setup() {
-   frameRate(FRAME_RATIO);
+   //Aqui eu ajusto o frameratio pra 24fps, se você não fizer isso ele pode acabar puxando um pouquinho a memória do seu PC kk;
+   frameRate(24);
+   //Aqui eu crio um elemento canvas, com o tamanho da matriz que eu vou desenhar;
+
    createCanvas(MATRIX_SIZE * SQUARE_SIZE, MATRIX_SIZE * SQUARE_SIZE);
 
+   //Aqui eu tô populando o array squares com os elementos do tipo square que vão ser usados na simulação
    for (let x = 0; x < MATRIX_SIZE; x++) {
       for (let y = 0; y < MATRIX_SIZE; y++) {
          squares.push(new Square(x, y, SQUARE_SIZE));
       }
    }
 
+   //Estado inicial = 0 (atualmente, 0 = edição, 1 = preparando A*, 2 = executando A*)
    state = 0;
+   //Objeto inicial sendo colocado (0 = pedras, 1 = ouro, 2 = água, 3 = navio)
    editingObj = 0;
 
+   //Setando os limites de ouro e de navios a serem colocados
    shipCount = 1;
-   goldCount = 3;
+   goldCount = 1;
 
+   //Criando os elementos HTMl
    createEditButton();
    createPutRockButton();
    createStartButton();
@@ -202,6 +225,11 @@ function setup() {
    createGoldCountLabel();
 }
 
+/*
+   Essas duas funções atualizam o valor de 
+   ouro e navios disponíveis a cada iteração
+*/
+
 function updateShipLabel() {
    shipLabel.html(`Navios: ${shipCount}`);
 }
@@ -210,6 +238,9 @@ function updateGoldLabel() {
    goldLabel.html(`Tesouros: ${goldCount}`);
 }
 
+/*
+   Função heurística do A*, basicamente pega a distância euclidiana entre os nós;
+*/
 function heuristic(nodeA, nodeB) {
    let dx = abs(nodeA.x - nodeB.x);
    let dy = abs(nodeA.y - nodeB.y);
@@ -217,7 +248,10 @@ function heuristic(nodeA, nodeB) {
    return sqrt(pow(dx, 2) + pow(dy, 2));
 }
 
-function recurPath(node) {
+/*
+   Percorre todos os nós que originaram o caminho, pintando eles de azul
+*/
+function printPath(node) {
    let temp = node;
    while (temp.cameFrom != undefined) {
       if (!endNode.includes(temp)) {
@@ -230,33 +264,57 @@ function recurPath(node) {
 }
 
 function draw() {
+   // Loop da aplicação
    background(0);
    //Desenha o grid
    drawGrid();
    if (state == 0) {
       //Estado 0, editando;
+
+      //Atualizando a qtd de navios e tesouros disponíveis
       updateShipLabel();
       updateGoldLabel();
    } else if (state == 1) {
+      /*
+         Basicamente quando a pessoa aperta "Começar" o algorítmo vem pra cá e inicia
+         quando tu adicionar os teus algorítmos tu pode fazer mais states e alguma variável
+         pra dizer qual algorítmo vai executar tipo
+
+         State - 1 : prepara A*
+         State - 2 : Executa A*
+
+         State - 3 : prepara DFS
+         State - 4 : Executa DFS
+      */
       //Estado 1, setando o openset a partir da posição do navio.
       openSet.push(...squares.filter((item) => item.state == 3));
       endNode.push(squares.filter((item) => item.state == 1)[0]); // pegando apenas um dos tesouros
       startNode.push(...squares.filter((item) => item.state == 3));
+
+      //Setando os vizinhos dos nós;
       for (let i = 0; i < squares.length; i++) {
          squares[i].vizinhos(squares);
       }
-      console.log("openSet: ", openSet, openSet[0].x, openSet[0].y);
-      //Passa automaticamente pra o estado 2;
+      //Passa automaticamente pra o estado 2 (Execução de A*);
       state += 1;
    } else if (state == 2) {
-      console.log("Iterando...");
       //Roda o algorítmo
       //Caso meu openset não seja vazio
+
+      //Aqui basicamente é execução de A*. Precisando de explicação chama no zap
+
+      /*
+         é importante saber que ele roda o algorítmo atrás de 2 condições,
+
+            1 - Ainda não encontrei o objetivo
+            2 - Meu openset tem elementos
+
+         Se alguma das duas não for verdade eu encerro o algorítmo e boto pra o state 0 de edição
+      */
       if (openSet.length > 0) {
          //Seta o melhor lugar arbitráriamente
          var winner = 0;
          //Procura para ver a melhor escolha
-         console.log("Competidores: ", openSet);
          for (var i = 0; i < openSet.length; i++) {
             if (openSet[i].f < openSet[winner].f) {
                winner = i;
@@ -264,7 +322,6 @@ function draw() {
          }
 
          let current = openSet[winner];
-         console.log("Escolhido: ", openSet[winner]);
 
          if (current.state == 1) {
             squares = squares.map((item) => {
@@ -274,7 +331,7 @@ function draw() {
                }
                return item;
             });
-            recurPath(current);
+            printPath(current);
             state = 0;
          } else {
             openSet = openSet.filter(
@@ -295,7 +352,6 @@ function draw() {
                            neighbor.g = tempG;
                         }
                      } else {
-                        console.log("Não está ainda");
                         neighbor.g = tempG;
                         openSet.push(neighbor);
                      }
@@ -329,12 +385,12 @@ function draw() {
          }
       } else {
          state = 0;
-         console.log("Algorítmo acabou!");
       }
    }
 }
 
 function drawGrid() {
+   //Desenha cada quadrado do grid
    let sl = squares.length;
    for (var i = 0; i < sl; i++) {
       squares[i].display();
@@ -342,6 +398,7 @@ function drawGrid() {
 }
 
 function triggerSquareClick(newState) {
+   //
    let sl = squares.length;
    for (var i = 0; i < sl; i++) {
       squares[i].click(newState, this);
@@ -349,6 +406,8 @@ function triggerSquareClick(newState) {
 }
 
 function mousePressed() {
+   //Quando clicar no mouse, se estiver editando
+   //Pega o editing object e chama o click do quadrado pra ele trocar
    if (state == 0) {
       if (editingObj == 0) {
          //Put rocks
