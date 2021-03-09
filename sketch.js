@@ -399,15 +399,25 @@ function drawGrid() {
 
 function triggerSquareClick(newState) {
    //
+   console.log();
    let sl = squares.length;
    for (var i = 0; i < sl; i++) {
       squares[i].click(newState, this);
    }
 }
 
+function mouseDragged() {
+   updateObjects();
+   console.log("mouseDragging", mouseX, mouseY);
+}
+
 function mousePressed() {
    //Quando clicar no mouse, se estiver editando
    //Pega o editing object e chama o click do quadrado pra ele trocar
+   updateObjects();
+}
+
+function updateObjects() {
    if (state == 0) {
       if (editingObj == 0) {
          //Put rocks
