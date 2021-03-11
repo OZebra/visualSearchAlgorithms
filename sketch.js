@@ -1,5 +1,5 @@
 const SQUARE_SIZE = 18;
-const MATRIX_SIZE = 50;
+const MATRIX_SIZE = 52;
 const FRAME_RATIO = 24;
 
 var squares = [], //Armazena os nós do algorítmo
@@ -245,7 +245,7 @@ function heuristic(nodeA, nodeB) {
    let dx = abs(nodeA.x - nodeB.x);
    let dy = abs(nodeA.y - nodeB.y);
    //Retorna a distância euclidiana dos nós
-   return sqrt(pow(dx, 2) + pow(dy, 2));
+   return dx + dy;
 }
 
 /*
