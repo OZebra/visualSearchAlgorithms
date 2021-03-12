@@ -361,8 +361,8 @@ function heuristic(nodeA, nodeB) {
       //Retorna a distância manhattan dos nós
       return dx + dy;
    } else {
-      let dx = abs(nodeA.xCenter - nodeB.xCenter);
-      let dy = abs(nodeA.yCenter - nodeB.yCenter);
+      let dx = abs(nodeA.x - nodeB.x);
+      let dy = abs(nodeA.y - nodeB.y);
       //Retorna a distância euclidiana dos nós
       return Math.sqrt(dx * dx + dy * dy);
    }
