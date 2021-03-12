@@ -300,13 +300,13 @@ function setup() {
    ouro e navios disponíveis a cada iteração
 */
 
-function updateShipLabel() {
-   shipLabel.html(`Navios: ${shipCount}`);
-}
+// function updateShipLabel() {
+//    shipLabel.html(`Navios: ${shipCount}`);
+// }
 
-function updateGoldLabel() {
-   goldLabel.html(`Tesouros: ${goldCount}`);
-}
+// function updateGoldLabel() {
+//    goldLabel.html(`Tesouros: ${goldCount}`);
+// }
 
 /*
    Função heurística do A*, basicamente pega a distância euclidiana entre os nós;
@@ -340,10 +340,6 @@ function draw() {
    drawGrid();
    if (state == 0) {
       //Estado 0, editando;
-
-      //Atualizando a qtd de navios e tesouros disponíveis
-      updateShipLabel();
-      updateGoldLabel();
    } else if (state == 1) {
       /*
          Basicamente quando a pessoa aperta "Começar" o algorítmo vem pra cá e inicia
