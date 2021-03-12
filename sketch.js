@@ -11,7 +11,7 @@ var squares = [], //Armazena os nós do algorítmo
    playButton, //
    eraseButton, //
    shipButton, //
-   chooseAlgoButon,
+   chooseAlgoButton,
    dataDropdown,
    stateLabel, // Todos esses são apenas criação de elementos de
    shipLabel, // texto e botões para poder editar e começar o
@@ -19,6 +19,7 @@ var squares = [], //Armazena os nós do algorítmo
    titleLabel,
    subtitleLabel,
    subtitleLabel2,
+   algoLabel,
    divider,
    rockButton, //
    goldButton; //
@@ -191,8 +192,9 @@ function createPutShipButton() {
 }
 
 function createChooseAlgoButton(){
-   chooseAlgoButon = createButton(`Dropdown<i class="material-icons right">arrow_drop_down</i>`);
-   chooseAlgoButon.attribute("href", "#!")
+   chooseAlgoButton = createButton(`Escolher Algoritmo<i class="material-icons right">arrow_drop_down</i>`);
+   chooseAlgoButton.attribute("href", "#!");
+   chooseAlgoButton.addClass('deep-purple');
    dataDropdown = createElement('ul', `
          <li><a href="#!" id="type_bfs">BFS</a></li>
          <li><a href="#!" id="type_greedy">Greedy Best First Search</a></li>
@@ -201,20 +203,25 @@ function createChooseAlgoButton(){
 
    dataDropdown.id("dropdown1");
    dataDropdown.addClass("dropdown-content");
-   chooseAlgoButon.addClass("dropdown-trigger btn");
-   chooseAlgoButon.attribute("data-target", "dropdown1");
+   chooseAlgoButton.addClass("dropdown-trigger btn");
+   chooseAlgoButton.attribute("data-target", "dropdown1");
 
    const elems = document.querySelectorAll('.dropdown-trigger');
    M.Dropdown.init(elems);
    dataDropdown.mouseClicked(e => {
       // set variable with e.target.id
-      console.log(e.target.id)
+      const algoName = {
+         'type_bfs': 'BFS',
+         'type_greedy': 'Greedy Best First Search',
+         'type_a_*': 'A*',
+      } [e.target.id] || ''
+      algoLabel.html(`<b>Algoritmo Escolhido:</b> ${algoName}`)
    })
 }
 
 function createStateLabel() {
-   stateLabel = createDiv(`<h5><b>Estado do Programa:</b></h5> Colocando pedras...`);
-   stateLabel.id('label_edit');
+   stateLabel = createDiv(`<b>Estado do Programa:</b> Colocando pedras...`);
+   stateLabel.addClass('label_status');
 }
 
 function createTitleLabel(){
@@ -228,6 +235,11 @@ function createSubtitleLabel(){
    subtitleLabel2 = createElement('blockquote', `
       Imagine se Jack Sparrow soubesse de algoritmos de busca, a franquia teria acabado no primeiro filme! Teste os algoritmos abaixo para ver o que melhor ajudaria Jack.`);
    subtitleLabel2.style("border-left: 5px solid #00695c;")
+}
+
+function createAlgoLabel(){
+   algoLabel = createDiv(`<b>Algoritmo Escolhido:</b>`);
+   algoLabel.addClass('label_status')
 }
 
 function createDivider(){
@@ -260,8 +272,6 @@ function setup() {
    shipCount = 1;
    goldCount = 1;
 
-   
-
    //Criando os elementos HTMl
    createEditButton();
    createPutRockButton();
@@ -273,6 +283,7 @@ function setup() {
    createTitleLabel();
    createSubtitleLabel();
    createChooseAlgoButton();
+   createAlgoLabel();
    let divider1 = createDivider();
    let divider2 = createDivider();
 
@@ -294,13 +305,14 @@ function setup() {
    div.child(div_label);
    div_actions.child(dataDropdown);
    div_actions.child(editButton);
-   div_actions.child(chooseAlgoButon);
+   div_actions.child(chooseAlgoButton);
    div_actions.child(playButton);
    div_row.child(rockButton);
    div_row.child(goldButton);
    div_row.child(shipButton);
    div_row.child(eraseButton);
    div_label.child(stateLabel);
+   div_label.child(algoLabel);
 }
 
 /*

@@ -3,7 +3,7 @@ html, body {
   padding: 0;
 }
 
-.button-m5, #label_edit {
+.button-m5, #label_edit, .label_status {
   margin: 5px;
 }
 
