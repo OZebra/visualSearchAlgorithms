@@ -343,13 +343,13 @@ function heuristic(nodeA, nodeB) {
    if(heuristicType == 'Manhattan'){
       let dx = abs(nodeA.x - nodeB.x);
       let dy = abs(nodeA.y - nodeB.y);
-      //Retorna a distância euclidiana dos nós
+      //Retorna a distância manhattan dos nós
       return dx + dy;
    } else {
       let dx = abs(nodeA.x - nodeB.x);
       let dy = abs(nodeA.y - nodeB.y);
       //Retorna a distância euclidiana dos nós
-      return Math.sqrt(dx + dy);
+      return Math.sqrt(dx * dx + dy * dy);
    }
    
 }
