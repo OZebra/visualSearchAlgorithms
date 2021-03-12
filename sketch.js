@@ -11,9 +11,15 @@ var squares = [], //Armazena os nós do algorítmo
    playButton, //
    eraseButton, //
    shipButton, //
+   chooseAlgoButon,
+   dataDropdown,
    stateLabel, // Todos esses são apenas criação de elementos de
    shipLabel, // texto e botões para poder editar e começar o
    goldLabel, // algorítmo.
+   titleLabel,
+   subtitleLabel,
+   subtitleLabel2,
+   divider,
    rockButton, //
    goldButton,
    method = "DFS"; //
@@ -106,23 +112,27 @@ function Square(xparam, yparam, squareSize) {
 */
 
 function createEditButton() {
-   editButton = createButton("Editar");
-   editButton.style("font-size", "50px");
-   editButton.position(1000, 200);
+   editButton = createButton("Ativar Modo Edição");
+   editButton.addClass("waves-effect waves-light btn button-m5");
+   let icon = createElement('i', 'cloud');
+   icon.addClass('material-icons left');
+   editButton.child(icon);
    editButton.mousePressed(() => {
       state = 0;
       if (editingObj == 0) {
-         stateLabel.html("Editando: Colocando pedras...");
+         stateLabel.html("<b>Estado do Programa:</b> Colocando pedras...");
       } else {
-         stateLabel.html("Editando: Colocando ouro!");
+         stateLabel.html("<b>Estado do Programa:</b> Colocando ouro!");
       }
    });
 }
 
 function createStartButton() {
-   playButton = createButton("Começar");
-   playButton.style("font-size", "50px");
-   playButton.position(1000, 400);
+   playButton = createButton("Rodar Algoritmo");
+   playButton.addClass("waves-effect waves-light btn button-m5 orange accent-3");
+   let icon = createElement('i', 'cloud');
+   icon.addClass('material-icons left');
+   playButton.child(icon);
    playButton.mousePressed(() => {
       state = 1;
       stateLabel.html("Procurando tesouros!");
@@ -131,65 +141,97 @@ function createStartButton() {
 
 function createPutRockButton() {
    rockButton = createButton("Colocar Pedras");
-   rockButton.style("font-size", "20px");
-   rockButton.position(1150, 180);
+   rockButton.addClass("waves-effect waves-light btn button-m5 brown");
+   let icon = createElement('i', 'block');
+   icon.addClass('material-icons left');
+   rockButton.child(icon);
    rockButton.mousePressed(() => {
       state = 0;
       editingObj = 0;
-      stateLabel.html("Editando: Colocando pedras...");
+      stateLabel.html("<b>Estado do Programa:</b> Colocando pedras...");
    });
 }
 
 function createPutGoldButton() {
    goldButton = createButton("Colocar Ouro");
-   goldButton.style("font-size", "20px");
-   goldButton.position(1150, 215);
+   goldButton.addClass("waves-effect waves-light btn button-m5 amber accent-3");
+   let icon = createElement('i', 'attach_money');
+   icon.addClass('material-icons left');
+   goldButton.child(icon);
    goldButton.mousePressed(() => {
       state = 0;
       editingObj = 1;
-      stateLabel.html("Editando: Colocando ouro!");
+      stateLabel.html("<b>Estado do Programa:</b> Colocando ouro!");
    });
 }
 
 function createEraseButton() {
    eraseButton = createButton("Desfazer");
-   eraseButton.style("font-size", "20px");
-   eraseButton.position(1150, 250);
+   eraseButton.addClass("waves-effect waves-light btn button-m5 grey");
+   let icon = createElement('i', 'cancel');
+   icon.addClass('material-icons left');
+   eraseButton.child(icon);
    eraseButton.mousePressed(() => {
       state = 0;
       editingObj = 2;
-      stateLabel.html("Editando: Desfazendo alterações");
+      stateLabel.html("<b>Estado do Programa:</b> Desfazendo alterações");
    });
 }
 
 function createPutShipButton() {
    shipButton = createButton("Colocar Navio");
-   shipButton.style("font-size", "20px");
-   shipButton.position(1150, 300);
+   shipButton.addClass("waves-effect waves-light btn button-m5 blue");
+   let icon = createElement('i', 'directions_boat');
+   icon.addClass('material-icons left');
+   shipButton.child(icon);
    shipButton.mousePressed(() => {
       state = 0;
       editingObj = 3;
-      stateLabel.html("Editando: Posicionando Frota!");
+      stateLabel.html("<b>Estado do Programa:</b> Posicionando Frota!");
    });
 }
 
+function createChooseAlgoButton(){
+   chooseAlgoButon = createButton(`Dropdown<i class="material-icons right">arrow_drop_down</i>`);
+   chooseAlgoButon.attribute("href", "#!")
+   dataDropdown = createElement('ul', `
+         <li>DFS</li>
+         <li>BFS</li>
+         <li>Greedy Best First Search</li>
+         <li>A*</li>
+      `)
+   M.Dropdown.init(chooseAlgoButon);
+
+   dataDropdown.id("dropdown2");
+   dataDropdown.addClass("dropdown-content");
+   chooseAlgoButon.addClass("btn dropdown-trigger");
+   chooseAlgoButon.attribute("data-target", "#dropdown2");
+}
+
 function createStateLabel() {
-   stateLabel = createDiv(`Editando: Colocando pedras...`);
-   stateLabel.style("font-size: 50px");
-   stateLabel.position(1000, 500);
+   stateLabel = createDiv(`<h5><b>Estado do Programa:</b></h5> Colocando pedras...`);
+   stateLabel.id('label_edit');
 }
 
-function createShipCountLabel() {
-   shipLabel = createDiv(`Navios: ${shipCount}`);
-   shipLabel.style("font-size: 30px");
-   shipLabel.position(1000, 570);
+function createTitleLabel(){
+   titleLabel = createElement('h2', `💰💰💰 Caça ao Tesouro 💰💰💰`);
+   titleLabel.addClass('lobster');
 }
 
-function createGoldCountLabel() {
-   goldLabel = createDiv(`Tesouros: ${goldCount}`);
-   goldLabel.style("font-size: 30px");
-   goldLabel.position(1000, 610);
+function createSubtitleLabel(){
+   subtitleLabel = createElement('blockquote', `
+      A história começa no século 17, quando o pirata Jack Sparrow tem o navio saqueado e roubado pelo capitão Barbossa (Geoffrey Rush). Com a embarcação de Sparrow, o vilão invade e saqueia a cidade de Port Royal, levando com ele Elizabeth Swann (Keira Knightley), a filha do governador Weatherby Swann (Jonathan Pryce).`);
+   subtitleLabel2 = createElement('blockquote', `
+      Imagine se Jack Sparrow soubesse de algoritmos de busca, a franquia teria acabado no primeiro filme! Teste os algoritmos abaixo para ver o que melhor ajudaria Jack.`);
+   subtitleLabel2.style("border-left: 5px solid #00695c;")
 }
+
+function createDivider(){
+   let divider = createDiv();
+   divider.addClass("divider");
+   return divider;
+}
+
 //A função setup roda uma vez no início do código/
 function setup() {
    //Aqui eu ajusto o frameratio pra 24fps, se você não fizer isso ele pode acabar puxando um pouquinho a memória do seu PC kk;
@@ -214,6 +256,8 @@ function setup() {
    shipCount = 1;
    goldCount = 1;
 
+   
+
    //Criando os elementos HTMl
    createEditButton();
    createPutRockButton();
@@ -222,8 +266,34 @@ function setup() {
    createPutGoldButton();
    createEraseButton();
    createPutShipButton();
-   createShipCountLabel();
-   createGoldCountLabel();
+   createTitleLabel();
+   createSubtitleLabel();
+   let divider1 = createDivider();
+   let divider2 = createDivider();
+
+   let div = createDiv('');
+   div.position(1000, 20);
+   div.style("width:700px;");
+   let div_actions = createDiv('');
+   let div_row = createDiv('');
+   let div_label = createDiv('');
+   div.addClass('container');
+   div_actions.addClass('actions');
+   div.child(titleLabel);
+   div.child(subtitleLabel);
+   div.child(subtitleLabel2);
+   div.child(div_actions);
+   div.child(divider1);
+   div.child(div_row);
+   div.child(divider2);
+   div.child(div_label);
+   div_actions.child(editButton);
+   div_actions.child(playButton);
+   div_row.child(rockButton);
+   div_row.child(goldButton);
+   div_row.child(shipButton);
+   div_row.child(eraseButton);
+   div_label.child(stateLabel);
 }
 
 /*
