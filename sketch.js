@@ -15,7 +15,8 @@ var squares = [], //Armazena os nós do algorítmo
    shipLabel, // texto e botões para poder editar e começar o
    goldLabel, // algorítmo.
    rockButton, //
-   goldButton; //
+   goldButton,
+   method = "A*"; //
 
 var openSet = [], //Armazena os nós que estão sendo visitados(A*)
    closedSet = [], //Armazena os nós que já foram visitados (A*)
@@ -311,83 +312,260 @@ function draw() {
 
          Se alguma das duas não for verdade eu encerro o algorítmo e boto pra o state 0 de edição
       */
-      if (openSet.length > 0) {
-         //Seta o melhor lugar arbitráriamente
-         var winner = 0;
-         //Procura para ver a melhor escolha
-         for (var i = 0; i < openSet.length; i++) {
-            if (openSet[i].f < openSet[winner].f) {
-               winner = i;
-            }
-         }
-
-         let current = openSet[winner];
-
-         if (current.state == 1) {
-            squares = squares.map((item) => {
-               if (item.x == current.x && item.y == current.y) {
-                  item.color = color(0, 255, 0);
-                  return item;
-               }
-               return item;
-            });
-            printPath(current);
-            state = 0;
-         } else {
-            openSet = openSet.filter(
-               (item) => item.x != current.x || item.y != current.y
-            );
-            closedSet.push(current);
-
-            var neighbourhood = current.neighbourhood;
-
-            for (var i = 0; i < neighbourhood.length; i++) {
-               var neighbor = neighbourhood[i];
-               if (neighbor.state != 0) {
-                  if (!closedSet.includes(neighbor)) {
-                     var tempG = current.g + 1;
-
-                     if (openSet.includes(neighbor)) {
-                        if (tempG < neighbor.g) {
-                           neighbor.g = tempG;
-                        }
-                     } else {
-                        neighbor.g = tempG;
-                        openSet.push(neighbor);
-                     }
-
-                     neighbor.h = heuristic(neighbor, endNode[0]);
-                     neighbor.f = neighbor.g + neighbor.h;
-                     neighbor.cameFrom = current;
-                  }
-               }
-            }
-            //Change color as we iterate to track
-            squares = squares.map((item) => {
-               if (
-                  openSet.includes(item) &&
-                  !startNode.includes(item) &&
-                  item.state != 0
-               ) {
-                  item.color = color("#FF748C");
-                  return item;
-               }
-               if (
-                  closedSet.includes(item) &&
-                  !startNode.includes(item) &&
-                  item.state != 0
-               ) {
-                  item.color = color("#F4CCFF");
-                  return item;
-               }
-               return item;
-            });
-         }
-      } else {
-         state = 0;
+      switch(method){
+         case "A*":
+            callAEstrela();
+            break;
+         case "DFS":
+            callDFS();
+            break;
+         case "BFS":
+            callBFS();
+            break;
+         case "Greedy":
+            callGreedy();
+            break;
+         default: 
+            console.error("unknown method");
       }
+      
    }
 }
+
+function callGreedy(){
+   if (openSet.length > 0) {
+      //Seta o melhor lugar arbitráriamente
+      var winner = 0;
+      //Procura para ver a melhor escolha
+      for (var i = 0; i < openSet.length; i++) {
+         if (openSet[i].f < openSet[winner].f) {
+            winner = i;
+         }
+      }
+
+      let current = openSet[winner];
+
+      if (current.state == 1) {
+         squares = squares.map((item) => {
+            if (item.x == current.x && item.y == current.y) {
+               item.color = color(0, 255, 0);
+               return item;
+            }
+            return item;
+         });
+         printPath(current);
+         state = 0;
+      } else {
+         openSet = openSet.filter(
+            (item) => item.x != current.x || item.y != current.y
+         );
+         closedSet.push(current);
+
+         var neighbourhood = current.neighbourhood;
+
+         for (var i = 0; i < neighbourhood.length; i++) {
+            var neighbor = neighbourhood[i];
+            if (neighbor.state != 0) {
+               if (!closedSet.includes(neighbor)) {
+                  // var tempG = current.g + 1;
+
+                  if (openSet.includes(neighbor)) {
+                     // if (tempG < neighbor.g) {
+                     //    neighbor.g = tempG;
+                     // }
+                  } else {
+                     // neighbor.g = tempG;
+                     openSet.push(neighbor);
+                  }
+
+                  neighbor.h = heuristic(neighbor, endNode[0]);
+                  neighbor.f = neighbor.h;
+                  neighbor.cameFrom = current;
+               }
+            }
+         }
+         //Change color as we iterate to track
+         squares = squares.map((item) => {
+            if (
+               openSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#FF748C");
+               return item;
+            }
+            if (
+               closedSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#F4CCFF");
+               return item;
+            }
+            return item;
+         });
+      }
+   } else {
+      state = 0;
+   }
+}
+
+function callAEstrela(){
+   if (openSet.length > 0) {
+      //Seta o melhor lugar arbitráriamente
+      var winner = 0;
+      //Procura para ver a melhor escolha
+      for (var i = 0; i < openSet.length; i++) {
+         if (openSet[i].f < openSet[winner].f) {
+            winner = i;
+         }
+      }
+
+      let current = openSet[winner];
+
+      if (current.state == 1) {
+         squares = squares.map((item) => {
+            if (item.x == current.x && item.y == current.y) {
+               item.color = color(0, 255, 0);
+               return item;
+            }
+            return item;
+         });
+         printPath(current);
+         state = 0;
+      } else {
+         openSet = openSet.filter(
+            (item) => item.x != current.x || item.y != current.y
+         );
+         closedSet.push(current);
+
+         var neighbourhood = current.neighbourhood;
+
+         for (var i = 0; i < neighbourhood.length; i++) {
+            var neighbor = neighbourhood[i];
+            if (neighbor.state != 0) {
+               if (!closedSet.includes(neighbor)) {
+                  var tempG = current.g + 1;
+
+                  if (openSet.includes(neighbor)) {
+                     if (tempG < neighbor.g) {
+                        neighbor.g = tempG;
+                     }
+                  } else {
+                     neighbor.g = tempG;
+                     openSet.push(neighbor);
+                  }
+
+                  neighbor.h = heuristic(neighbor, endNode[0]);
+                  neighbor.f = neighbor.g + neighbor.h;
+                  neighbor.cameFrom = current;
+               }
+            }
+         }
+         //Change color as we iterate to track
+         squares = squares.map((item) => {
+            if (
+               openSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#FF748C");
+               return item;
+            }
+            if (
+               closedSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#F4CCFF");
+               return item;
+            }
+            return item;
+         });
+      }
+   } else {
+      state = 0;
+   }
+}
+
+function callBFS(){
+   if (openSet.length > 0) {
+      //Seta o melhor lugar arbitráriamente
+      // var winner = 0;
+      // //Procura para ver a melhor escolha
+      // for (var i = 0; i < openSet.length; i++) {
+      //    if (openSet[i].f < openSet[winner].f) {
+      //       winner = i;
+      //    }
+      // }
+
+      let current = openSet[winner];
+
+      if (current.state == 1) {
+         squares = squares.map((item) => {
+            if (item.x == current.x && item.y == current.y) {
+               item.color = color(0, 255, 0);
+               return item;
+            }
+            return item;
+         });
+         printPath(current);
+         state = 0;
+      } else {
+         openSet = openSet.filter(
+            (item) => item.x != current.x || item.y != current.y
+         );
+         closedSet.push(current);
+
+         var neighbourhood = current.neighbourhood;
+
+         for (var i = 0; i < neighbourhood.length; i++) {
+            var neighbor = neighbourhood[i];
+            if (neighbor.state != 0) {
+               if (!closedSet.includes(neighbor)) {
+                  var tempG = current.g + 1;
+
+                  if (openSet.includes(neighbor)) {
+                     if (tempG < neighbor.g) {
+                        neighbor.g = tempG;
+                     }
+                  } else {
+                     neighbor.g = tempG;
+                     openSet.push(neighbor);
+                  }
+
+                  neighbor.h = heuristic(neighbor, endNode[0]);
+                  neighbor.f = neighbor.g + neighbor.h;
+                  neighbor.cameFrom = current;
+               }
+            }
+         }
+         //Change color as we iterate to track
+         squares = squares.map((item) => {
+            if (
+               openSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#FF748C");
+               return item;
+            }
+            if (
+               closedSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#F4CCFF");
+               return item;
+            }
+            return item;
+         });
+      }
+   } else {
+      state = 0;
+   }
+}
+
 
 function drawGrid() {
    //Desenha cada quadrado do grid
