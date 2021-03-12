@@ -196,17 +196,22 @@ function createChooseAlgoButton(){
    chooseAlgoButon = createButton(`Dropdown<i class="material-icons right">arrow_drop_down</i>`);
    chooseAlgoButon.attribute("href", "#!")
    dataDropdown = createElement('ul', `
-         <li>DFS</li>
-         <li>BFS</li>
-         <li>Greedy Best First Search</li>
-         <li>A*</li>
+         <li><a href="#!" id="type_bfs">BFS</a></li>
+         <li><a href="#!" id="type_greedy">Greedy Best First Search</a></li>
+         <li><a href="#!" id="type_a_*">A*</a></li>
       `)
-   M.Dropdown.init(chooseAlgoButon);
 
-   dataDropdown.id("dropdown2");
+   dataDropdown.id("dropdown1");
    dataDropdown.addClass("dropdown-content");
-   chooseAlgoButon.addClass("btn dropdown-trigger");
-   chooseAlgoButon.attribute("data-target", "#dropdown2");
+   chooseAlgoButon.addClass("dropdown-trigger btn");
+   chooseAlgoButon.attribute("data-target", "dropdown1");
+
+   const elems = document.querySelectorAll('.dropdown-trigger');
+   M.Dropdown.init(elems);
+   dataDropdown.mouseClicked(e => {
+      // set variable with e.target.id
+      console.log(e.target.id)
+   })
 }
 
 function createStateLabel() {
@@ -269,6 +274,7 @@ function setup() {
    createPutShipButton();
    createTitleLabel();
    createSubtitleLabel();
+   createChooseAlgoButton();
    let divider1 = createDivider();
    let divider2 = createDivider();
 
@@ -288,7 +294,9 @@ function setup() {
    div.child(div_row);
    div.child(divider2);
    div.child(div_label);
+   div_actions.child(dataDropdown);
    div_actions.child(editButton);
+   div_actions.child(chooseAlgoButon);
    div_actions.child(playButton);
    div_row.child(rockButton);
    div_row.child(goldButton);
