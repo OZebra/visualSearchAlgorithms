@@ -16,7 +16,7 @@ var squares = [], //Armazena os nós do algorítmo
    goldLabel, // algorítmo.
    rockButton, //
    goldButton,
-   method = "A*"; //
+   method = "DFS"; //
 
 var openSet = [], //Armazena os nós que estão sendo visitados(A*)
    closedSet = [], //Armazena os nós que já foram visitados (A*)
@@ -489,18 +489,11 @@ function callAEstrela(){
 }
 
 function callBFS(){
+   
    if (openSet.length > 0) {
       //Seta o melhor lugar arbitráriamente
-      // var winner = 0;
-      // //Procura para ver a melhor escolha
-      // for (var i = 0; i < openSet.length; i++) {
-      //    if (openSet[i].f < openSet[winner].f) {
-      //       winner = i;
-      //    }
-      // }
-
-      let current = openSet[winner];
-
+      let current = closedSet.length == 0 ? startNode[0] : openSet[0] ;
+      console.log("current: ", current, "and StartNode: ", startNode);
       if (current.state == 1) {
          squares = squares.map((item) => {
             if (item.x == current.x && item.y == current.y) {
@@ -520,22 +513,19 @@ function callBFS(){
          var neighbourhood = current.neighbourhood;
 
          for (var i = 0; i < neighbourhood.length; i++) {
+            console.log("for loop", neighbourhood[i]);
             var neighbor = neighbourhood[i];
             if (neighbor.state != 0) {
                if (!closedSet.includes(neighbor)) {
-                  var tempG = current.g + 1;
-
                   if (openSet.includes(neighbor)) {
-                     if (tempG < neighbor.g) {
-                        neighbor.g = tempG;
-                     }
+                     // if (tempG < neighbor.g) {
+                     //    neighbor.g = tempG;
+                     // }
                   } else {
-                     neighbor.g = tempG;
+                     // neighbor.g = tempG;
                      openSet.push(neighbor);
                   }
 
-                  neighbor.h = heuristic(neighbor, endNode[0]);
-                  neighbor.f = neighbor.g + neighbor.h;
                   neighbor.cameFrom = current;
                }
             }
@@ -566,6 +556,76 @@ function callBFS(){
    }
 }
 
+function callDFS(){
+   
+   if (openSet.length > 0) {
+      //Seta o melhor lugar arbitráriamente
+      let current = closedSet.length == 0 ? startNode[0] : openSet[openSet.length - 1];
+      if (current.state == 1) {
+         squares = squares.map((item) => {
+            if (item.x == current.x && item.y == current.y) {
+               item.color = color(0, 255, 0);
+               return item;
+            }
+            return item;
+         });
+         printPath(current);
+         state = 0;
+      } else {
+         openSet = openSet.filter(
+            (item) => item.x != current.x || item.y != current.y
+         );
+         closedSet.push(current);
+
+         var neighbourhood = current.neighbourhood;
+
+         for (var i = 0; i < neighbourhood.length; i++) {
+            var neighbor = neighbourhood[i];
+            if (neighbor.state != 0) {
+               if(neighbor.state == 1){
+                  openSet.push(neighbor);
+                  neighbor.cameFrom = current;       
+                  break;
+               }
+               if (!closedSet.includes(neighbor)) {
+                  if (openSet.includes(neighbor)) {
+                     // if (tempG < neighbor.g) {
+                     //    neighbor.g = tempG;
+                     // }
+                  } else {
+                     // neighbor.g = tempG;
+                     openSet.push(neighbor);
+                  }
+
+                  neighbor.cameFrom = current;
+               }
+            } 
+         }
+         //Change color as we iterate to track
+         squares = squares.map((item) => {
+            if (
+               openSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#FF748C");
+               return item;
+            }
+            if (
+               closedSet.includes(item) &&
+               !startNode.includes(item) &&
+               item.state != 0
+            ) {
+               item.color = color("#F4CCFF");
+               return item;
+            }
+            return item;
+         });
+      }
+   } else {
+      state = 0;
+   }
+}
 
 function drawGrid() {
    //Desenha cada quadrado do grid
