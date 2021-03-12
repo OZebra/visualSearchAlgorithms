@@ -193,12 +193,14 @@ function createPutShipButton() {
 }
 
 function createChooseAlgoButton(){
-   chooseAlgoButon = createButton(`Dropdown<i class="material-icons right">arrow_drop_down</i>`);
+   chooseAlgoButon = createButton(`Algoritmo<i class="material-icons right">arrow_drop_down</i>`);
    chooseAlgoButon.attribute("href", "#!")
    dataDropdown = createElement('ul', `
-         <li><a href="#!" id="type_bfs">BFS</a></li>
-         <li><a href="#!" id="type_greedy">Greedy Best First Search</a></li>
-         <li><a href="#!" id="type_a_*">A*</a></li>
+         <li><a href="#BFS" id="type_bfs">BFS</a></li>
+         <li><a href="#BGFSM" id="type_greedy_m">Best First Search - Manhattan</a></li>
+         <li><a href="#BGFE" id="type_greedy_e">Best First Search - Euclidean</a></li>
+         <li><a href="#AM" id="type_a_*_m">A* - Manhattan</a></li>
+         <li><a href="#AE" id="type_a_*_e">A* - Euclidean</a></li>
       `)
 
    dataDropdown.id("dropdown1");
@@ -211,6 +213,22 @@ function createChooseAlgoButton(){
    dataDropdown.mouseClicked(e => {
       // set variable with e.target.id
       console.log(e.target.id)
+      if(e.target.id == "type_a_*_m"){
+         method = "A*";
+         heuristicType = "Manhattan";
+      } else if(e.target.id == "type_a_*_e"){
+         method = "A*";
+         heuristicType = "Euclidean";
+      } else if(e.target.id == "type_greedy_e"){
+         method = "Greedy";
+         heuristicType = "Euclidean";
+      } else if(e.target.id == "type_greedy_m"){
+         method = "Greedy";
+         heuristicType = "Manhattan";
+      } else if( e.target.id == "type_bfs"){
+         method = "BFS";
+      }
+      
    })
 }
 
@@ -572,11 +590,11 @@ function callAEstrela(){
 }
 
 function callBFS(){
-   
+   console.log("callBFS");
    if (openSet.length > 0) {
       //Seta o melhor lugar arbitráriamente
       let current = closedSet.length == 0 ? startNode[0] : openSet[0] ;
-      console.log("current: ", current, "and StartNode: ", startNode);
+     
       if (current.state == 1) {
          squares = squares.map((item) => {
             if (item.x == current.x && item.y == current.y) {
