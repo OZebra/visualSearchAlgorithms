@@ -233,9 +233,11 @@ function createChooseAlgoButton(){
       
       const algoName = {
          'type_bfs': 'BFS',
-         'type_greedy': 'Greedy Best First Search',
-         'type_a_*': 'A*',
-      } [e.target.id] || ''
+         'type_greedy_m': 'Best First Search - Manhattan',
+         'type_greedy_e': 'Best First Search - Euclidean',
+         'type_a_*_m': 'A* - Manhattan',
+         'type_a_*_e': 'A* - Euclidean',
+      }[e.target.id] || ''
       algoLabel.html(`<b>Algoritmo Escolhido:</b> ${algoName}`)
    })
 }
@@ -359,8 +361,8 @@ function heuristic(nodeA, nodeB) {
       //Retorna a distância manhattan dos nós
       return dx + dy;
    } else {
-      let dx = abs(nodeA.x - nodeB.x);
-      let dy = abs(nodeA.y - nodeB.y);
+      let dx = abs(nodeA.xCenter - nodeB.xCenter);
+      let dy = abs(nodeA.yCenter - nodeB.yCenter);
       //Retorna a distância euclidiana dos nós
       return Math.sqrt(dx * dx + dy * dy);
    }
