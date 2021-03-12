@@ -22,7 +22,8 @@ var squares = [], //Armazena os nós do algorítmo
    divider,
    rockButton, //
    goldButton,
-   method = "DFS"; //
+   method = "A*",
+   heuristicType = "Manhattan"; //
 
 var openSet = [], //Armazena os nós que estão sendo visitados(A*)
    closedSet = [], //Armazena os nós que já foram visitados (A*)
@@ -313,10 +314,18 @@ function setup() {
    Função heurística do A*, basicamente pega a distância euclidiana entre os nós;
 */
 function heuristic(nodeA, nodeB) {
-   let dx = abs(nodeA.x - nodeB.x);
-   let dy = abs(nodeA.y - nodeB.y);
-   //Retorna a distância euclidiana dos nós
-   return dx + dy;
+   if(heuristicType == 'Manhattan'){
+      let dx = abs(nodeA.x - nodeB.x);
+      let dy = abs(nodeA.y - nodeB.y);
+      //Retorna a distância euclidiana dos nós
+      return dx + dy;
+   } else {
+      let dx = abs(nodeA.x - nodeB.x);
+      let dy = abs(nodeA.y - nodeB.y);
+      //Retorna a distância euclidiana dos nós
+      return Math.sqrt(dx + dy);
+   }
+   
 }
 
 /*
@@ -648,11 +657,6 @@ function callDFS(){
          for (var i = 0; i < neighbourhood.length; i++) {
             var neighbor = neighbourhood[i];
             if (neighbor.state != 0) {
-               if(neighbor.state == 1){
-                  openSet.push(neighbor);
-                  neighbor.cameFrom = current;       
-                  break;
-               }
                if (!closedSet.includes(neighbor)) {
                   if (openSet.includes(neighbor)) {
                      // if (tempG < neighbor.g) {
